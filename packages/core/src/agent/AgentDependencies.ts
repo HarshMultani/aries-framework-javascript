@@ -1,6 +1,7 @@
 import type { FileSystem } from '../storage/FileSystem'
 import type { EventEmitter } from 'events'
 import type * as Indy from 'indy-sdk'
+// @ts-ignore
 import type fetch from 'node-fetch'
 import type WebSocket from 'ws'
 
