@@ -44,7 +44,11 @@ export class IndyIssuerService {
 
       return schema
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
@@ -74,7 +78,11 @@ export class IndyIssuerService {
 
       return credentialDefinition
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
@@ -88,7 +96,11 @@ export class IndyIssuerService {
     try {
       return await this.indy.issuerCreateCredentialOffer(this.wallet.handle, credentialDefinitionId)
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
