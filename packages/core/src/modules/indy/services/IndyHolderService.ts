@@ -35,7 +35,10 @@ export class IndyHolderService {
         revocationStates
       )
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+      throw error
     }
   }
 
@@ -61,7 +64,11 @@ export class IndyHolderService {
         revocationRegistryDefinitions ?? null
       )
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
@@ -78,7 +85,11 @@ export class IndyHolderService {
     try {
       return await this.indy.proverGetCredential(this.wallet.handle, credentialId)
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
@@ -101,7 +112,11 @@ export class IndyHolderService {
         this.wallet.masterSecretId
       )
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 
@@ -177,7 +192,11 @@ export class IndyHolderService {
 
       return credentials
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 }
