@@ -1,7 +1,9 @@
+// @ts-ignore
 import type { AgentDependencies } from '@aries-framework/core'
 
 import { EventEmitter } from 'events'
 import * as indy from 'indy-sdk'
+// @ts-ignore
 import fetch from 'node-fetch'
 import WebSocket from 'ws'
 
