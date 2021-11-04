@@ -2,6 +2,7 @@ import type { Agent } from '../agent/Agent'
 import type { Logger } from '../logger'
 import type { OutboundPackage } from '../types'
 import type { OutboundTransport } from './OutboundTransport'
+// @ts-ignore
 import type fetch from 'node-fetch'
 
 import { AbortController } from 'abort-controller'
@@ -58,6 +59,7 @@ export class HttpOutboundTransport implements OutboundTransport {
         clearTimeout(id)
         responseMessage = await response.text()
       } catch (error) {
+        if (error instanceof Error) {
         // Request is aborted after 15 seconds, but that doesn't necessarily mean the request
         // went wrong. ACA-Py keeps the socket alive until it has a response message. So we assume
         // that if the error was aborted and we had return routing enabled, we should ignore the error.
@@ -68,6 +70,7 @@ export class HttpOutboundTransport implements OutboundTransport {
         } else {
           throw error
         }
+      }
       }
 
       // TODO: do we just want to ignore messages that were returned if we didn't request it?
@@ -85,13 +88,15 @@ export class HttpOutboundTransport implements OutboundTransport {
         this.logger.debug(`No response received.`)
       }
     } catch (error) {
-      this.logger.error(`Error sending message to ${endpoint}: ${error.message}`, {
-        error,
-        message: error.message,
-        body: payload,
-        didCommMimeType: this.agentConfig.didCommMimeType,
-      })
-      throw new AriesFrameworkError(`Error sending message to ${endpoint}: ${error.message}`, { cause: error })
+      if (error instanceof Error) {
+        this.logger.error(`Error sending message to ${endpoint}: ${error.message}`, {
+          error,
+          message: error.message,
+          body: payload,
+          didCommMimeType: this.agentConfig.didCommMimeType,
+        })
+        throw new AriesFrameworkError(`Error sending message to ${endpoint}: ${error.message}`, { cause: error })
+      } 
     }
   }
 }
