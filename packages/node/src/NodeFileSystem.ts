@@ -1,3 +1,4 @@
+// @ts-ignore
 import type { FileSystem } from '@aries-framework/core'
 
 import { promises } from 'fs'
