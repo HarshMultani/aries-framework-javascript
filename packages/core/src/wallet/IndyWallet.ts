@@ -76,12 +76,17 @@ export class IndyWallet implements Wallet {
       await this.open(walletConfig)
     } catch (error) {
       // If the wallet does not exist yet, create it and try to open again
-      if (error instanceof WalletNotFoundError) {
-        await this.create(walletConfig)
-        await this.open(walletConfig)
-      } else {
-        throw error
+
+      if (error instanceof Error) {
+        if (error instanceof WalletNotFoundError) {
+          await this.create(walletConfig)
+          await this.open(walletConfig)
+        } else {
+          throw error
+        }
       }
+
+
     }
 
     this.logger.debug(`Wallet '${walletConfig.id}' initialized with handle '${this.handle}'`)
@@ -97,22 +102,24 @@ export class IndyWallet implements Wallet {
     try {
       await this.indy.createWallet({ id: walletConfig.id }, { key: walletConfig.key })
     } catch (error) {
-      if (isIndyError(error, 'WalletAlreadyExistsError')) {
-        const errorMessage = `Wallet '${walletConfig.id}' already exists`
-        this.logger.debug(errorMessage)
-
-        throw new WalletDuplicateError(errorMessage, {
-          walletType: 'IndyWallet',
-          cause: error,
-        })
-      } else {
-        const errorMessage = `Error creating wallet '${walletConfig.id}'`
-        this.logger.error(errorMessage, {
-          error,
-          errorMessage: error.message,
-        })
-
-        throw new WalletError(errorMessage, { cause: error })
+      if (error instanceof Error) {
+        if (isIndyError(error, 'WalletAlreadyExistsError')) {
+          const errorMessage = `Wallet '${walletConfig.id}' already exists`
+          this.logger.debug(errorMessage)
+  
+          throw new WalletDuplicateError(errorMessage, {
+            walletType: 'IndyWallet',
+            cause: error,
+          })
+        } else {
+          const errorMessage = `Error creating wallet '${walletConfig.id}'`
+          this.logger.error(errorMessage, {
+            error,
+            errorMessage: error.message,
+          })
+  
+          throw new WalletError(errorMessage, { cause: error })
+        }
       }
     }
   }
@@ -139,30 +146,33 @@ export class IndyWallet implements Wallet {
         masterSecretId,
       }
     } catch (error) {
-      if (isIndyError(error, 'WalletNotFoundError')) {
-        const errorMessage = `Wallet '${walletConfig.id}' not found`
-        this.logger.debug(errorMessage)
 
-        throw new WalletNotFoundError(errorMessage, {
-          walletType: 'IndyWallet',
-          cause: error,
-        })
-      } else if (isIndyError(error, 'WalletAccessFailed')) {
-        const errorMessage = `Incorrect key for wallet '${walletConfig.id}'`
-        this.logger.debug(errorMessage)
-        throw new WalletInvalidKeyError(errorMessage, {
-          walletType: 'IndyWallet',
-          cause: error,
-        })
-      } else {
-        const errorMessage = `Error opening wallet '${walletConfig.id}'`
-        this.logger.error(errorMessage, {
-          error,
-          errorMessage: error.message,
-        })
-
-        throw new WalletError(errorMessage, { cause: error })
-      }
+      if (error instanceof Error) {
+        if (isIndyError(error, 'WalletNotFoundError')) {
+          const errorMessage = `Wallet '${walletConfig.id}' not found`
+          this.logger.debug(errorMessage)
+  
+          throw new WalletNotFoundError(errorMessage, {
+            walletType: 'IndyWallet',
+            cause: error,
+          })
+        } else if (isIndyError(error, 'WalletAccessFailed')) {
+          const errorMessage = `Incorrect key for wallet '${walletConfig.id}'`
+          this.logger.debug(errorMessage)
+          throw new WalletInvalidKeyError(errorMessage, {
+            walletType: 'IndyWallet',
+            cause: error,
+          })
+        } else {
+          const errorMessage = `Error opening wallet '${walletConfig.id}'`
+          this.logger.error(errorMessage, {
+            error,
+            errorMessage: error.message,
+          })
+  
+          throw new WalletError(errorMessage, { cause: error })
+        }
+      } 
     }
   }
 
@@ -186,22 +196,24 @@ export class IndyWallet implements Wallet {
     try {
       await this.indy.deleteWallet(walletInfo.walletConfig, walletInfo.walletCredentials)
     } catch (error) {
-      if (isIndyError(error, 'WalletNotFoundError')) {
-        const errorMessage = `Error deleting wallet: wallet '${walletInfo.walletConfig.id}' not found`
-        this.logger.debug(errorMessage)
-
-        throw new WalletNotFoundError(errorMessage, {
-          walletType: 'IndyWallet',
-          cause: error,
-        })
-      } else {
-        const errorMessage = `Error deleting wallet '${walletInfo.walletConfig.id}': ${error.message}`
-        this.logger.error(errorMessage, {
-          error,
-          errorMessage: error.message,
-        })
-
-        throw new WalletError(errorMessage, { cause: error })
+      if (error instanceof Error) {
+        if (isIndyError(error, 'WalletNotFoundError')) {
+          const errorMessage = `Error deleting wallet: wallet '${walletInfo.walletConfig.id}' not found`
+          this.logger.debug(errorMessage)
+  
+          throw new WalletNotFoundError(errorMessage, {
+            walletType: 'IndyWallet',
+            cause: error,
+          })
+        } else {
+          const errorMessage = `Error deleting wallet '${walletInfo.walletConfig.id}': ${error.message}`
+          this.logger.error(errorMessage, {
+            error,
+            errorMessage: error.message,
+          })
+  
+          throw new WalletError(errorMessage, { cause: error })
+        }
       }
     }
   }
@@ -215,21 +227,23 @@ export class IndyWallet implements Wallet {
       this.openWalletInfo = undefined
       this.publicDidInfo = undefined
     } catch (error) {
-      if (isIndyError(error, 'WalletInvalidHandle')) {
-        const errorMessage = `Error closing wallet: wallet already closed`
-        this.logger.debug(errorMessage)
-
-        throw new WalletError(errorMessage, {
-          cause: error,
-        })
-      } else {
-        const errorMessage = `Error closing wallet': ${error.message}`
-        this.logger.error(errorMessage, {
-          error,
-          errorMessage: error.message,
-        })
-
-        throw new WalletError(errorMessage, { cause: error })
+      if (error instanceof Error) {
+        if (isIndyError(error, 'WalletInvalidHandle')) {
+          const errorMessage = `Error closing wallet: wallet already closed`
+          this.logger.debug(errorMessage)
+  
+          throw new WalletError(errorMessage, {
+            cause: error,
+          })
+        } else {
+          const errorMessage = `Error closing wallet': ${error.message}`
+          this.logger.error(errorMessage, {
+            error,
+            errorMessage: error.message,
+          })
+  
+          throw new WalletError(errorMessage, { cause: error })
+        }
       }
     }
   }
@@ -250,28 +264,34 @@ export class IndyWallet implements Wallet {
 
       return masterSecretId
     } catch (error) {
-      if (isIndyError(error, 'AnoncredsMasterSecretDuplicateNameError')) {
-        // master secret id is the same as the master secret id passed in the create function
-        // so if it already exists we can just assign it.
-        this.logger.debug(
-          `Master secret with id '${masterSecretId}' already exists in wallet with handle '${walletHandle}'`,
-          {
-            indyError: 'AnoncredsMasterSecretDuplicateNameError',
-          }
-        )
 
-        return masterSecretId
-      } else {
-        this.logger.error(`Error creating master secret with id ${masterSecretId}`, {
-          indyError: error.indyName,
-          error,
-        })
-
-        throw new WalletError(
-          `Error creating master secret with id ${masterSecretId} in wallet with handle '${walletHandle}'`,
-          { cause: error }
-        )
+      if (isIndyError(error)) {
+        if (isIndyError(error, 'AnoncredsMasterSecretDuplicateNameError')) {
+          // master secret id is the same as the master secret id passed in the create function
+          // so if it already exists we can just assign it.
+          this.logger.debug(
+            `Master secret with id '${masterSecretId}' already exists in wallet with handle '${walletHandle}'`,
+            {
+              indyError: 'AnoncredsMasterSecretDuplicateNameError',
+            }
+          )
+  
+          return masterSecretId
+        } else {
+          this.logger.error(`Error creating master secret with id ${masterSecretId}`, {
+            indyError: "error.indyName",
+            error,
+          })
+  
+          throw new WalletError(
+            `Error creating master secret with id ${masterSecretId} in wallet with handle '${walletHandle}'`,
+            { cause: error }
+          )
+        }
       }
+
+      throw error
+
     }
   }
 
@@ -289,7 +309,10 @@ export class IndyWallet implements Wallet {
 
       return { did, verkey }
     } catch (error) {
-      throw new WalletError('Error creating Did', { cause: error })
+      if (error instanceof Error) {
+        throw new WalletError('Error creating Did', { cause: error })
+      }
+      throw error      
     }
   }
 
@@ -303,7 +326,10 @@ export class IndyWallet implements Wallet {
       const packedMessage = await this.indy.packMessage(this.handle, messageRaw, recipientKeys, senderVerkey ?? null)
       return JsonEncoder.fromBuffer(packedMessage)
     } catch (error) {
-      throw new WalletError('Error packing message', { cause: error })
+      if (error instanceof Error) {
+        throw new WalletError('Error packing message', { cause: error })
+      }
+      throw error 
     }
   }
 
@@ -317,7 +343,11 @@ export class IndyWallet implements Wallet {
         message: JsonEncoder.fromString(unpackedMessage.message),
       }
     } catch (error) {
-      throw new WalletError('Error unpacking message', { cause: error })
+
+      if (error instanceof Error) {
+        throw new WalletError('Error unpacking message', { cause: error })
+      }
+      throw error       
     }
   }
 
@@ -325,7 +355,10 @@ export class IndyWallet implements Wallet {
     try {
       return await this.indy.cryptoSign(this.handle, verkey, data)
     } catch (error) {
-      throw new WalletError(`Error signing data with verkey ${verkey}`, { cause: error })
+      if (error instanceof Error) {
+        throw new WalletError(`Error signing data with verkey ${verkey}`, { cause: error })
+      }
+      throw error      
     }
   }
 
@@ -336,7 +369,12 @@ export class IndyWallet implements Wallet {
 
       return isValid
     } catch (error) {
-      throw new WalletError(`Error verifying signature of data signed with verkey ${signerVerkey}`, { cause: error })
+
+      if (error instanceof Error) {
+        throw new WalletError(`Error verifying signature of data signed with verkey ${signerVerkey}`, { cause: error })
+      }
+      throw error 
+      
     }
   }
 
@@ -344,7 +382,11 @@ export class IndyWallet implements Wallet {
     try {
       return await this.indy.generateNonce()
     } catch (error) {
-      throw new WalletError('Error generating nonce', { cause: error })
+      if (error instanceof Error) {
+        throw new WalletError('Error generating nonce', { cause: error })
+      }
+      throw error 
+      
     }
   }
 }
