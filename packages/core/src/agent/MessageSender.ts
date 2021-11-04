@@ -92,7 +92,9 @@ export class MessageSender {
         await session.send(packedMessage)
         return
       } catch (error) {
-        this.logger.info(`Sending packed message via session failed with error: ${error.message}.`, error)
+        if (error instanceof Error) {
+          this.logger.info(`Sending packed message via session failed with error: ${error.message}.`, error)
+        }
       }
     }
 
@@ -119,13 +121,15 @@ export class MessageSender {
         }
         return
       } catch (error) {
-        this.logger.debug(
-          `Sending outbound message to service with id ${service.id} failed with the following error:`,
-          {
-            message: error.message,
-            error: error,
-          }
-        )
+        if (error instanceof Error) {
+          this.logger.debug(
+            `Sending outbound message to service with id ${service.id} failed with the following error:`,
+            {
+              message: error.message,
+              error: error,
+            }
+          )
+        }
       }
     }
 
@@ -166,7 +170,9 @@ export class MessageSender {
         await this.sendMessageToSession(session, payload)
         return
       } catch (error) {
-        this.logger.info(`Sending an outbound message via session failed with error: ${error.message}.`, error)
+        if (error instanceof Error) {
+          this.logger.info(`Sending an outbound message via session failed with error: ${error.message}.`, error)
+        }
       }
     }
 
@@ -188,13 +194,15 @@ export class MessageSender {
         })
         return
       } catch (error) {
-        this.logger.debug(
-          `Sending outbound message to service with id ${service.id} failed with the following error:`,
-          {
-            message: error.message,
-            error: error,
-          }
-        )
+        if (error instanceof Error) {
+          this.logger.debug(
+            `Sending outbound message to service with id ${service.id} failed with the following error:`,
+            {
+              message: error.message,
+              error: error,
+            }
+          )
+        }
       }
     }
 
