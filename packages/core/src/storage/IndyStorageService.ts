@@ -231,7 +231,11 @@ export class IndyStorageService<T extends BaseRecord> implements StorageService<
         }
       }
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 }
