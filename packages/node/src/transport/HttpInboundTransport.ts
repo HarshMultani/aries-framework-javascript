@@ -1,7 +1,9 @@
+// @ts-ignore
 import type { InboundTransport, Agent, TransportSession, WireMessage } from '@aries-framework/core'
 import type { Express, Request, Response } from 'express'
 import type { Server } from 'http'
 
+// @ts-ignore
 import { DidCommMimeType, AriesFrameworkError, AgentConfig, TransportService, utils } from '@aries-framework/core'
 import express, { text } from 'express'
 
@@ -48,8 +50,10 @@ export class HttpInboundTransport implements InboundTransport {
           res.status(200).end()
         }
       } catch (error) {
-        config.logger.error(`Error processing inbound message: ${error.message}`, error)
-        res.status(500).send('Error processing message')
+        if (error instanceof Error) {
+          config.logger.error(`Error processing inbound message: ${error.message}`, error)
+          res.status(500).send('Error processing message')
+        }
       } finally {
         transportService.removeSession(session)
       }
