@@ -4,6 +4,7 @@ import { Lifecycle, scoped } from 'tsyringe'
 
 import { AgentConfig } from '../../../agent/AgentConfig'
 import { IndySdkError } from '../../../error'
+import { isIndyError } from '../../../utils/indyError'
 
 @scoped(Lifecycle.ContainerScoped)
 export class IndyVerifierService {
@@ -31,7 +32,11 @@ export class IndyVerifierService {
         revocationStates
       )
     } catch (error) {
-      throw new IndySdkError(error)
+      if (isIndyError(error)) {
+        throw new IndySdkError(error)
+      }
+
+      throw error
     }
   }
 }
