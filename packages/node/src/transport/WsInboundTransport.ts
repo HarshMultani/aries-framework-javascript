@@ -1,5 +1,6 @@
+// @ts-ignore
 import type { Agent, InboundTransport, Logger, TransportSession, WireMessage } from '@aries-framework/core'
-
+// @ts-ignore
 import { AriesFrameworkError, AgentConfig, TransportService, utils } from '@aries-framework/core'
 import WebSocket, { Server } from 'ws'
 
@@ -20,7 +21,7 @@ export class WsInboundTransport implements InboundTransport {
 
     this.logger = config.logger
 
-    const wsEndpoint = config.endpoints.find((e) => e.startsWith('ws'))
+    const wsEndpoint = config.endpoints.find((e:any) => e.startsWith('ws'))
     this.logger.debug(`Starting WS inbound transport`, {
       endpoint: wsEndpoint,
     })
